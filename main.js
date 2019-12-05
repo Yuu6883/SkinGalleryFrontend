@@ -13,6 +13,7 @@ $(window).on("load", () => {
     const Starfield = require("./starfield");
 
     let halloween = false;
+    let padoru = false;
     let today = new Date();
     let month = today.getMonth() + 1; // Autism
     let date  = today.getDate();
@@ -31,7 +32,41 @@ $(window).on("load", () => {
                               `<img width="30" height="30" src="assets/img/pumpkin.png">`);
     }
 
-    new Starfield($("#starfield")[0], { halloween }).start();
+    if (localStorage.theme == "padoru" || month == 12) {
+            
+        padoru = true;
+        // Padoru theme
+        $(":root").prop("style").setProperty("--background-color", " rgba(0,37,57,0.75) ");
+        $(":root").prop("style").setProperty("--card--color",      "  #002b45 ");
+        $(":root").prop("style").setProperty("--button-color",      "  #6696ff ");
+        $(":root").prop("style").setProperty("--button-hover",      "  #375abb ");
+        $(":root").prop("style").setProperty("--button-disabled",   "  #666b7a ");
+
+        $("#extra-info").html(`<img width="30" height="30" class="padoru pointer" src="assets/img/padoru.png">` +
+                                `<span>Merry Christmas!</span>` + 
+                              `<img width="30" height="30" class="padoru h-flip pointer" src="assets/img/padoru.png">`);
+
+        const padoruSound = new Audio("/assets/mp3/padoru.mp3");
+        $(".padoru").dblclick(() => {
+            if (padoruSound.paused) {
+                padoruSound.currentTime = 0;
+                padoruSound.play();
+                setTimeout(() => {
+                    Prompt.alert.fire({
+                        title: "PADORU PADORU",
+                        imageUrl: "/assets/img/padoru.png"
+                    });
+                }, 9000);
+            }
+        });
+    }
+
+    if (localStorage.theme == "off") {
+        halloween = false;
+        padoru = false;
+    }
+
+    new Starfield($("#starfield")[0], { halloween, padoru }).start();
 
     $("#login").click(() => API.redirectLogin());
     $("#logout").click(() => API.logout());

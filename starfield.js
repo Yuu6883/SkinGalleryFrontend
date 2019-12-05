@@ -14,6 +14,7 @@ class Starfield {
      * @param {String} [options.color]
      * @param {Number} [options.alpha]
      * @param {Boolean} [options.halloween] Interesting
+     * @param {Boolean} [options.padoru] PADORU PADORU
      */
     constructor (canvas, options) {
 
@@ -33,12 +34,18 @@ class Starfield {
             color: "#00b8ff",
             alpha: .9,
             halloween: false,
+            padoru:    false
         };
 
         Object.assign(this.config, options);
 
         if (this.config.halloween) {
             this.config.color = '#ffb13d';
+        }
+
+        if (this.config.padoru) {
+            this.config.color = "#c9ffe8";
+            this.config.speedBase *= 5;
         }
 
         this.resize();
@@ -61,9 +68,15 @@ class Starfield {
     }
 
     createStar() {
+
         if (this.config.halloween && Math.random() < 0.01) {
-            return new Pumpkin(this, this.randomVector);
+            return new ImageEffect(this, "pumpkin", this.randomVector);
         }
+
+        if (this.config.padoru && Math.random() < 0.01) {
+            return new ImageEffect(this, "padoru", this.randomVector, { rotate: 20 });
+        }
+
         return new Star(this, this.randomVector);
     }
 
@@ -183,27 +196,40 @@ class Star {
     }
 }
 
-class Pumpkin extends Star {
+class ImageEffect extends Star {
 
     /** 
      * @param {Starfield} field
+     * @param {String} imgID
      * @param {Vector} initVector
+     * @param {Object} options
+     * @param {Number}  [options.rotate]
+     * @param {Boolean} [options.clockwise]
      */
-    constructor(field, initVector) {
+    constructor(field, imgID, initVector, options={}) {
         super(field, initVector);
 
-        this.img = document.getElementById("pumpkin");
+        this.img = document.getElementById(imgID);
         this.rotation = this.angle;
-        this.clockWise = Math.random() < 0.5;
         this.radius *= 500;
         this.alpha = 0;
-        this.targeAlpha = 0.5 + Math.random() / 2;
+        this.targetAlpha = 0.5 + Math.random() / 2;
+
+        if (options.clockwise === true) {
+            this.clockWise = true;
+        } else if (options.clockwise === false) {
+            this.clockWise = false;
+        } else {
+            this.clockWise = Math.random() < 0.5;
+        }
+
+        this.angularSpeedFactor = options.rotate || 1;
     }
 
     update(dt) {
         super.update(dt);
-        this.rotation += (this.clockWise ? 1 : -1) * dt / 100;
-        this.alpha = Math.min(this.alpha + dt / 300, this.targeAlpha);
+        this.rotation += (this.clockWise ? 1 : -1) * dt / 100 * this.angularSpeedFactor;
+        this.alpha = Math.min(this.alpha + dt / 300, this.targetAlpha);
     }
 
     draw() {

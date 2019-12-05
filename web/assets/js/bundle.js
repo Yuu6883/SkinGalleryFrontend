@@ -22803,6 +22803,7 @@ $(window).on("load", () => {
     const Starfield = require("./starfield");
 
     let halloween = false;
+    let padoru = false;
     let today = new Date();
     let month = today.getMonth() + 1; // Autism
     let date  = today.getDate();
@@ -22821,7 +22822,41 @@ $(window).on("load", () => {
                               `<img width="30" height="30" src="assets/img/pumpkin.png">`);
     }
 
-    new Starfield($("#starfield")[0], { halloween }).start();
+    if (localStorage.theme == "padoru" || month == 12) {
+            
+        padoru = true;
+        // Padoru theme
+        $(":root").prop("style").setProperty("--background-color", " rgba(0,37,57,0.75) ");
+        $(":root").prop("style").setProperty("--card--color",      "  #002b45 ");
+        $(":root").prop("style").setProperty("--button-color",      "  #6696ff ");
+        $(":root").prop("style").setProperty("--button-hover",      "  #375abb ");
+        $(":root").prop("style").setProperty("--button-disabled",   "  #666b7a ");
+
+        $("#extra-info").html(`<img width="30" height="30" class="padoru pointer" src="assets/img/padoru.png">` +
+                                `<span>Merry Christmas!</span>` + 
+                              `<img width="30" height="30" class="padoru h-flip pointer" src="assets/img/padoru.png">`);
+
+        const padoruSound = new Audio("/assets/mp3/padoru.mp3");
+        $(".padoru").dblclick(() => {
+            if (padoruSound.paused) {
+                padoruSound.currentTime = 0;
+                padoruSound.play();
+                setTimeout(() => {
+                    Prompt.alert.fire({
+                        title: "PADORU PADORU",
+                        imageUrl: "/assets/img/padoru.png"
+                    });
+                }, 9000);
+            }
+        });
+    }
+
+    if (localStorage.theme == "off") {
+        halloween = false;
+        padoru = false;
+    }
+
+    new Starfield($("#starfield")[0], { halloween, padoru }).start();
 
     $("#login").click(() => API.redirectLogin());
     $("#logout").click(() => API.logout());
@@ -23570,6 +23605,7 @@ class Starfield {
      * @param {String} [options.color]
      * @param {Number} [options.alpha]
      * @param {Boolean} [options.halloween] Interesting
+     * @param {Boolean} [options.padoru] PADORU PADORU
      */
     constructor (canvas, options) {
 
@@ -23589,12 +23625,18 @@ class Starfield {
             color: "#00b8ff",
             alpha: .9,
             halloween: false,
+            padoru:    false
         };
 
         Object.assign(this.config, options);
 
         if (this.config.halloween) {
             this.config.color = '#ffb13d';
+        }
+
+        if (this.config.padoru) {
+            this.config.color = "#c9ffe8";
+            this.config.speedBase *= 5;
         }
 
         this.resize();
@@ -23617,9 +23659,15 @@ class Starfield {
     }
 
     createStar() {
+
         if (this.config.halloween && Math.random() < 0.01) {
-            return new Pumpkin(this, this.randomVector);
+            return new ImageEffect(this, "pumpkin", this.randomVector);
         }
+
+        if (this.config.padoru && Math.random() < 0.01) {
+            return new ImageEffect(this, "padoru", this.randomVector, { rotate: 20 });
+        }
+
         return new Star(this, this.randomVector);
     }
 
@@ -23739,27 +23787,40 @@ class Star {
     }
 }
 
-class Pumpkin extends Star {
+class ImageEffect extends Star {
 
     /** 
      * @param {Starfield} field
+     * @param {String} imgID
      * @param {Vector} initVector
+     * @param {Object} options
+     * @param {Number}  [options.rotate]
+     * @param {Boolean} [options.clockwise]
      */
-    constructor(field, initVector) {
+    constructor(field, imgID, initVector, options={}) {
         super(field, initVector);
 
-        this.img = document.getElementById("pumpkin");
+        this.img = document.getElementById(imgID);
         this.rotation = this.angle;
-        this.clockWise = Math.random() < 0.5;
         this.radius *= 500;
         this.alpha = 0;
-        this.targeAlpha = 0.5 + Math.random() / 2;
+        this.targetAlpha = 0.5 + Math.random() / 2;
+
+        if (options.clockwise === true) {
+            this.clockWise = true;
+        } else if (options.clockwise === false) {
+            this.clockWise = false;
+        } else {
+            this.clockWise = Math.random() < 0.5;
+        }
+
+        this.angularSpeedFactor = options.rotate || 1;
     }
 
     update(dt) {
         super.update(dt);
-        this.rotation += (this.clockWise ? 1 : -1) * dt / 100;
-        this.alpha = Math.min(this.alpha + dt / 300, this.targeAlpha);
+        this.rotation += (this.clockWise ? 1 : -1) * dt / 100 * this.angularSpeedFactor;
+        this.alpha = Math.min(this.alpha + dt / 300, this.targetAlpha);
     }
 
     draw() {
