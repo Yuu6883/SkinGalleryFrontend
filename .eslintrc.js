@@ -58,5 +58,6 @@ module.exports = {
     'react/forbid-prop-types': 0,
     'react/require-default-props': 0,
     'no-unused-expressions': 'error',
+    'react/prop-types': 0,
   },
 };
