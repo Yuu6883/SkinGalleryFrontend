@@ -1,28 +1,22 @@
 import { types as t } from 'mobx-state-tree';
+import Api from 'src/api';
+import { UserModel } from './models';
+import { asyncModel } from './utils';
 
-export const ViewerStore = t.model('ViewerStore', {
-  user: t.maybeNull(UserModel),
-});
+export const ViewerStore = t
+  .model('ViewerStore', {
+    user: t.maybeNull(UserModel),
+    loginFlow: asyncModel(loginFlow),
+  })
+  .actions((self) => ({
+    setViewer(user) {
+      self.user = user;
+    },
+  }));
 
-/*
-  maybe parse and bannedUntil, createdAt be t.Date?
-*/
-
-const UserModel = t.model('UserModel', {
-  id: t.identifier,
-  username: t.string,
-  discriminator: t.string,
-  avatar: t.string,
-  moderator: t.boolean,
-  favorites: t.array(t.string),
-  bannedUntil: t.number, // maybe doesn't exist?
-});
-
-const SkinModel = t.model('SkinModel', {
-  skinID: t.identifier,
-  status: t.string,
-  skinName: t.string,
-  public: t.boolean,
-  tags: t.array(t.string),
-  createdAt: t.number,
-});
+function loginFlow() {
+  return async (self, parent) => {
+    const { data } = await Api.Auth.login();
+    parent.setViewer(data);
+  };
+}

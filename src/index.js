@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
 import Router from './scenes/router';
 import './main.css';
+import { createStore, Provider } from './stores/createStore';
+
+const store = createStore();
 
 const App = () => {
   useEffect(() => {
@@ -10,9 +13,11 @@ const App = () => {
   }, []);
 
   return (
-    <BrowserRouter>
-      <Route path="/" component={Router} />
-    </BrowserRouter>
+    <Provider value={store}>
+      <BrowserRouter>
+        <Route path="/" component={Router} />
+      </BrowserRouter>
+    </Provider>
   );
 };
 

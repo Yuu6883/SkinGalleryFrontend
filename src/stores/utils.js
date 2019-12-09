@@ -47,7 +47,7 @@ export function asyncModel(thunk, auto = true) {
       },
     }));
 
-  return model.create();
+  return t.optional(model, {});
 }
 
 function parseError(e) {
