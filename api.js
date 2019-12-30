@@ -59,9 +59,8 @@ module.exports = new class API extends EventEmitter {
 
     /** @param {string} dataURL */
     checkDuplicate(dataURL) {
-        // let hash = this.hash(dataURL);
-        return false;
-        // return this.mySkins.find(s => s.hash == hash);
+        let hash = this.hash(dataURL);
+        return this.mySkins.find(s => s.hash == hash);
     }
 
     set myTotal(value) {

@@ -9,7 +9,7 @@ $(window).on("load", () => {
 
     const API = require("./api");
 
-    window.API = API;
+    // window.API = API;
     const Prompt = require("./prompt");
     const Pager = require("./pager");
     const Starfield = require("./starfield");
