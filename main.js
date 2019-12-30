@@ -8,6 +8,8 @@ const escapeHtml = unsafe => unsafe
 $(window).on("load", () => {
 
     const API = require("./api");
+
+    window.API = API;
     const Prompt = require("./prompt");
     const Pager = require("./pager");
     const Starfield = require("./starfield");
@@ -79,6 +81,14 @@ $(window).on("load", () => {
         $("#username").text(API.fullName);
         $("#skin-panel").show();
 
+        if (API.userInfo.moderator) {
+            // AB00000000SE
+            $("#hack").show()
+                .click(() => {
+                    Prompt.inputMultipleImages();
+                });
+        }
+
         API.listSkin(true);
         $(".center").css("min-height", "100%");
     });
@@ -105,7 +115,10 @@ $(window).on("load", () => {
     API.on("duplicate", s => Prompt.warnDuplicate(s));
 
     API.on("skinUploaded", res => {
-        if (res.error) return console.error(res.error);
+        if (res.error) {
+            Prompt.showError(res.error);
+            return console.error(res.error);
+        }
         Prompt.skinResult(res).then(() => API.listSkin(true));
     });
 

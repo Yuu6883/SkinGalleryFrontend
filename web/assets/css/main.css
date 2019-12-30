@@ -193,6 +193,10 @@ body, html {
     opacity: 0;
 }
 
+#hack {
+    display: none;
+}
+
 .center {
     position: absolute;
     top: 50%;

@@ -2,7 +2,7 @@ const { EventEmitter } = require("events");
 const DecryptSkin = require("./decode");
 const Crypto = require("crypto");
 
-/** @typedef {{ username: String, discriminator: String, avatar: String, id: String }} UserInfo */
+/** @typedef {{ username: String, discriminator: String, avatar: String, id: String, moderator: Boolean }} UserInfo */
 
 module.exports = new class API extends EventEmitter {
 
@@ -59,8 +59,9 @@ module.exports = new class API extends EventEmitter {
 
     /** @param {string} dataURL */
     checkDuplicate(dataURL) {
-        let hash = this.hash(dataURL);
-        return this.mySkins.find(s => s.hash == hash);
+        // let hash = this.hash(dataURL);
+        return false;
+        // return this.mySkins.find(s => s.hash == hash);
     }
 
     set myTotal(value) {
@@ -134,7 +135,7 @@ module.exports = new class API extends EventEmitter {
         });
     }
 
-    uploadSkin(name, data, isPublic) {
+    uploadSkin(name, data, isPublic, skip = false) {
 
         let dup = this.checkDuplicate(data);
         if (dup) {
@@ -142,16 +143,21 @@ module.exports = new class API extends EventEmitter {
             return;
         }
 
-        $.post({
-            url: `/api/skins/${encodeURIComponent(name)}${isPublic ? "?public=true" : ""}`,
-            data,
-            /** @param {{status:SkinStatus}} res */
-            success: res => {
-                this.emit("skinUploaded", res);
-            },
-            error: e => {
-                console.error(e);
-            }
+        return new Promise(resolve => {
+            $.post({
+                url: `/api/skins/${encodeURIComponent(name)}${isPublic ? "?public=true" : ""}`,
+                data,
+                /** @param {{status:SkinStatus}} res */
+                success: res => {
+                    if (!skip)
+                        this.emit("skinUploaded", res);
+                    resolve();
+                },
+                error: e => {
+                    console.error(e);
+                    resolve();
+                }
+            });
         });
     }
 
