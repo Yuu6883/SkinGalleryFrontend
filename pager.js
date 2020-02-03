@@ -92,12 +92,12 @@ const createMySkinPanel = skinObject => {
                 ${skinObject.status === "approved" ? `<span uk-icon="icon:link;ratio:1.5"      class="text uk-transition-slide-bottom skin-link"
                 link="${window.location.origin}${link}" uk-tooltip="Copy link"></span><br>` : ""}
 
-                <span uk-icon="icon:file-edit;ratio:1.5" class="text uk-transition-slide-bottom skin-edit"
-                        skin-id="${skinObject.skinID}" skin-name="${skinObject.skinName}" ${skinObject.public ? "skin-public='true'" : ""} 
-                        uk-tooltip="Edit"></span><br>
+                ${skinObject.status === "pending" ? "" : ` <span uk-icon="icon:file-edit;ratio:1.5" class="text uk-transition-slide-bottom skin-edit"
+                skin-id="${skinObject.skinID}" skin-name="${skinObject.skinName}" ${skinObject.public ? "skin-public='true'" : ""} 
+                uk-tooltip="Edit"></span><br>`}
 
-                <span uk-icon="icon:trash;ratio:1.5"     class="text uk-transition-slide-bottom skin-delete"
-                        skin-id="${skinObject.skinID}" skin-name="${skinObject.skinName}" uk-tooltip="Delete"></span>
+                ${skinObject.status === "pending" ? "" : `<span uk-icon="icon:trash;ratio:1.5"     class="text uk-transition-slide-bottom skin-delete"
+                skin-id="${skinObject.skinID}" skin-name="${skinObject.skinName}" uk-tooltip="Delete"></span>`}
             </div>
         </div>
     </div>`;
