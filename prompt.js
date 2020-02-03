@@ -88,12 +88,38 @@ module.exports = new class Prompt {
         });
     }
 
+    inputMultipleImages() {
+        this.alert.fire({
+            title: "Upload Multiple Skins",
+            html:   `<div class="uk-placeholder uk-margin-top uk-text-center upload-holder pointer uk-width-expand uk-vertical-align-middle upload-panel" uk-form-custom>
+                        <span class="uk-text-middle text">Attach skins by dropping here <br> or click to select </span>
+                        <span class="text" uk-icon="icon: cloud-upload"></span>
+                        <input class="pointer" type="file" accept="image/*" multiple id="skin-input-multiple">
+                    </div>`,
+            showCancelButton: true,
+            confirmButtonText: "Continue",
+            onOpen: () => {
+                let self = this;
+                $("#skin-input-multiple").change(async function() {
+                    /** @type {FileList} */
+                    let files = this.files;
+
+                    for (let i = 0; i < files.length; i++) {
+                        let file = files.item(i);
+                        await readImage(file).then(skin => self.confirmSkin(skin, i < files.length - 1));
+                    }
+
+                });
+            }
+        });
+    }
+
     showBanned(date) {
         return this.alert.fire("Ops...", `You are banned until ${MMDDYYYY(date)}`, "warning");
     }
 
     /** @param {{name:String,img:HTMLImageElement}} skin */
-    confirmSkin(skin) {
+    confirmSkin(skin, skip = false) {
         let canvas = document.createElement("canvas");
         canvas.width = canvas.height = 512;
         $(canvas).addClass("skin-preview");
@@ -111,7 +137,8 @@ module.exports = new class Prompt {
 
         let isPublic = true;
         let skinName = skin.name.split(".").slice(0, -1).join(".").slice(0, 16);
-        this.alert.fire({
+
+        return this.alert.fire({
             title: "Preview",
             text: extraMessage,
             input: "text",
@@ -124,7 +151,7 @@ module.exports = new class Prompt {
                 this.alert.getInput().value = "";
                 if (!value)
                     return "Skin name can't be empty";
-                if (value.length > 16) 
+                if (value.length > 16)
                     return "Skin name must not be longer than 16 characters";
                 for (let char of value.split("")) {
                     if (char != toUTF8(char))
@@ -146,7 +173,7 @@ module.exports = new class Prompt {
             }
         }).then(result => {
             if (result.dismiss) return;
-            API.uploadSkin($(this.alert.getInput()).val(), canvas.toDataURL("image/png", 1), isPublic);
+            return API.uploadSkin($(this.alert.getInput()).val(), canvas.toDataURL("image/png", 1), isPublic, skip);
         });
     }
 
@@ -181,6 +208,15 @@ module.exports = new class Prompt {
         }
     }
 
+    showError(e) {
+        return this.alert.fire({
+            title: "Error",
+            text: e,
+            type: "error",
+            confirmButtonText: "Ok boomer"
+        })
+    }
+
     /** @param {{status:SkinStatus}} res */
     skinResult(res) {
         switch (res.status) {
@@ -204,7 +240,13 @@ module.exports = new class Prompt {
     }
 
     skinDeleteResult(skinName) {
-        return this.alert.fire("Success", `Skin ${skinName} deleted`, "success");
+        return this.alert.fire({
+            title: "Success", 
+            text: `Skin ${skinName} deleted`, 
+            type: "success",
+            showConfirmButton: false,
+            timer: 2000
+        });
     }
 
     /**
