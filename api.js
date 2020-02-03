@@ -221,6 +221,8 @@ module.exports = new class API extends EventEmitter {
                     if (index > 0) this.mySkins.splice(index, 1);
 
                     this.emit("skinDeleteSuccess", name);
+                } else {
+                    this.emit("error", res.error || "Unknown Error");
                 }
             },
             error: console.error
@@ -245,7 +247,7 @@ module.exports = new class API extends EventEmitter {
                     this.favTotal = this.favorites.length;
                     this.emit("favAdded");
                 } else {
-                    this.emit("error", res.error);
+                    this.emit("error", res.error || "Unknown Error");
                 }
             },
             error: console.error
