@@ -12,16 +12,35 @@ const createPage = (curr, p, total) => $(`<li><a class="page-${p == "..." ? "dis
                     curr == p ? "active" : "btn"}">` + 
                     `${String(p).padStart(String(total).length, " ").replace(/ /g, "&nbsp;")}</a></li>`);
 
-/** @param {{curr:Number,total:Number,min:Number,onpage:Function}} param0 */
-const createView = ({ curr, total, min=0, onpage }) => {
+/** @param {{curr:Number,onpage:Function}} param0 */
+const createView = ({ curr, total, min=0, onpage, canJump=false }) => {
     total = Math.max(total, min);
     const prev = $(`<li><a class="page-${curr > 0         ? "btn" : "disable"}" id="prev-page">` + 
                    `<span uk-pagination-previous></span></a></li>`);
     const next = $(`<li><a class="page-${curr < total - 1 ? "btn" : "disable"}" id="next-page">` +
                    `<span uk-pagination-next    ></span></a></li>`);
+    const jumpTo = $(`<li><a class="btn">select page</a></li>`);
 
     prev.click(() => curr > 0         && setImmediate(() => onpage(curr - 1)));
     next.click(() => curr < total - 1 && setImmediate(() => onpage(curr + 1)));
+    jumpTo.click(() => {
+        Prompt.alert.fire({
+            title: "Select Page",
+            showCancelButton: true,
+            confirmButtonText: "Go",
+            input: "number",
+            inputValidator: val => {
+                if (val != ~~val) return "Integer expected";
+                val = ~~val;
+                if (val <= 0 || val > total) return `Page must range from 1 to ${total}`;
+            },
+            inputValue: curr + 1
+        }).then(result => {
+            if (result.value) {
+                curr == result.value || setImmediate(() => onpage(~~result.value - 1));
+            }
+        });
+    });
 
     let pages = [];
 
@@ -49,8 +68,9 @@ const createView = ({ curr, total, min=0, onpage }) => {
         }, -1);
     }
 
-    return [prev, ...pages, next];
+    return canJump ? [prev, ...pages, next, jumpTo] : [prev, ...pages, next];
 }
+
 /** @param {Boolean} allowUpload */
 const emptySkinPanel = allowUpload =>
 `<div class="uk-width-1-6@l uk-width-1-4@m uk-width-1-2 uk-card uk-margin-top">
@@ -241,7 +261,8 @@ module.exports = new class Pager {
         this.addStar(true);
 
         this.clearView();
-        let view = createView({ curr: page, total: Math.ceil(total / 12),
+        let view = createView({ curr: page, total: Math.ceil(total / 12), 
+            canJump: true,
             onpage: async p => {
                 let result = await API.getPublic({ page: p, force: true });
                 this.viewPublicSkins({ skins:result.skins, page: p, 
