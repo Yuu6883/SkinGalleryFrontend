@@ -2,7 +2,7 @@ const { EventEmitter } = require("events");
 const DecryptSkin = require("./decode");
 const Crypto = require("crypto");
 
-/** @typedef {{ username: String, discriminator: String, avatar: String, id: String, moderator: Boolean, limit: number }} UserInfo */
+/** @typedef {{ username: String, discriminator: String, avatar: String, id: String, moderator: Boolean, limit: number, bannedReason: string }} UserInfo */
 
 module.exports = new class API extends EventEmitter {
 

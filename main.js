@@ -110,11 +110,12 @@ $(window).on("load", () => {
         $("#skin-panel").hide();
     });
 
-    API.on("banned", date => Prompt.showBanned(date).then(() => {
+    API.on("banned", date => Prompt.showBanned(date, API.userInfo.bannedReason).then(() => {
         $("#login-panel").hide();
         $("#user-panel").show();
         $("#user-pfp").attr("src", "assets/img/lmao.png");
-        $("#username").html("<strong>ACHIEVEMENT UNLOCKED</strong><br> You have been banned");
+        $("#username").html("<strong>ACHIEVEMENT UNLOCKED</strong><br> You have been banned. Reason: " + API.userInfo.bannedReason);
+        $("#upload").remove();
     }));
 
     API.on("myskin", skins => Pager.viewMySkins(skins));

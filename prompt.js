@@ -114,8 +114,8 @@ module.exports = new class Prompt {
         });
     }
 
-    showBanned(date) {
-        return this.alert.fire("Ops...", `You are banned until ${MMDDYYYY(date)}`, "warning");
+    showBanned(date, reason) {
+        return this.alert.fire("Ops...", `You are banned until ${MMDDYYYY(date)} for ${reason || "some reason"}`, "warning");
     }
 
     /** @param {{name:String,img:HTMLImageElement}} skin */
