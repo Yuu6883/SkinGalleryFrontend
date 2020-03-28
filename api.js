@@ -307,7 +307,6 @@ module.exports = new class API extends EventEmitter {
 
         let buffer = await res.arrayBuffer();
         let skins = DecryptSkin(buffer);
-        console.log(skins, sort);
         sort[0] == "-" || (skins = skins.reverse());
         return { total, skins };
     }

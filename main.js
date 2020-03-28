@@ -162,9 +162,13 @@ $(window).on("load", () => {
 
     $(".sort-by").click(function() {
         if (API.sort != $(this).val()) {
+            Prompt.showLoader();
             API.sort = $(this).val();
             API.getPublic({ force: true })
-               .then(result => Pager.viewPublicSkins(result));
+               .then(result => {
+                   Prompt.hideLoader();
+                   Pager.viewPublicSkins(result)
+               });
         }
     });
 

@@ -264,7 +264,9 @@ module.exports = new class Pager {
         let view = createView({ curr: page, total: Math.ceil(total / 12), 
             canJump: true,
             onpage: async p => {
+                Prompt.showLoader();
                 let result = await API.getPublic({ page: p, force: true });
+                Prompt.hideLoader();
                 this.viewPublicSkins({ skins:result.skins, page: p, 
                                        total:result.total });
             }
