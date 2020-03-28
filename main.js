@@ -152,6 +152,7 @@ $(window).on("load", () => {
         .then(result => Pager.viewPublicSkins(result)));
 
     $("#fav-tab").click(() => Pager.viewFavSkins(API.favorites));
+    $("#rules").click(() => Pager.clearView());
 
     API.init();
 
