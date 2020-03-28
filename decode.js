@@ -19,7 +19,7 @@ const readUTF16 = buffer => String.fromCharCode(...new Uint16Array(buffer));
 const readTags = buffer => {
     let tags = [];
     let [num1, num2] = new Uint32Array(buffer);
-    let str = num1.toString(2).padStart(32, "0") + num2.toString(2).padEnd(32, "0");
+    let str = num1.toString(2).padStart(32, "0") + num2.toString(2).padStart(32, "0");
     for (let i = 0; i < SKIN_TAG_LENGTH; i++)
         str[i] == 1 && tags.push(TAGS[i]);
     return tags;

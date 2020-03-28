@@ -124,7 +124,7 @@ body, html {
     color: var(--button-color)!important;
 }
 
-.uk-checkbox:checked {
+.uk-checkbox:checked, .uk-radio:checked {
    background-color: var(--button-hover)!important; 
 }
 

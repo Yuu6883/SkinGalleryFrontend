@@ -160,6 +160,14 @@ $(window).on("load", () => {
     $("#fav-tab").click(() => Pager.viewFavSkins(API.favorites));
     $("#rules").click(() => Pager.clearView());
 
+    $(".sort-by").click(function() {
+        if (API.sort != $(this).val()) {
+            API.sort = $(this).val();
+            API.getPublic({ force: true })
+               .then(result => Pager.viewPublicSkins(result));
+        }
+    });
+
     API.init();
 
     $(document).ajaxStart(() => Prompt.showLoader());
