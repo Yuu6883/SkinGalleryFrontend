@@ -208,12 +208,21 @@ module.exports = new class Prompt {
         }
     }
 
+    warnLimit(limit = 60) {
+        this.alert.fire({
+            title: "Skin Limit Reached",
+            type: "warning",
+            html: `You can't upload skin because you've reached the upload limit (<strong>${limit}</strong>).` + 
+                  `If you really want more skin slots, contact Yuu on discord.`,
+        });
+    }
+
     showError(e) {
         return this.alert.fire({
             title: "Error",
             text: e,
             type: "error",
-            confirmButtonText: "Ok boomer"
+            confirmButtonText: "Ok"
         })
     }
 

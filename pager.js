@@ -218,7 +218,7 @@ module.exports = new class Pager {
     /** @param {ClientSkin[]} skins */
     async viewFavSkins(skins, page = this.page) {
         
-        this.page = page = Math.min(page, Math.ceil(skins.length / 12));
+        this.page = page = Math.min(page, Math.ceil(skins.length / 12) - 1);
 
         let skinsInView = skins.slice(PAGE_LIMIT * page, PAGE_LIMIT * (page + 1));
         let skinsHTML = skinsInView.map(createPubSkinPanel).join("");

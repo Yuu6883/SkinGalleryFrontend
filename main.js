@@ -72,7 +72,13 @@ $(window).on("load", () => {
 
     $("#login").click(() => API.redirectLogin());
     $("#logout").click(() => API.logout());
-    $("#upload").click(() => Prompt.inputImage());
+    $("#upload").click(() => {
+        if (API.mySkins.length < API.userInfo.limit) {
+            Prompt.inputImage();
+        } else {
+            Prompt.warnLimit(API.userInfo.limit);
+        }
+    });
 
     API.on("loginSuccess", () => {
         $("#login-panel").hide();
@@ -133,7 +139,7 @@ $(window).on("load", () => {
     });
 
     API.on("favAdded", () => {
-        Pager.viewFavSkins(API.favorites);
+        // Pager.viewFavSkins(API.favorites);
         Prompt.favAddSuccess();
     });
 
