@@ -63,18 +63,18 @@ $(window).on("load", () => {
         });
     }
 
-    let delayLogin = false;
+    let fool = false;
     if (localStorage.theme == "fool" || (month == 4 && date == 1)) {
-        delayLogin = true;
+        fool = true;
     }
 
     if (localStorage.theme == "off") {
         halloween = false;
         padoru = false;
-        delayLogin = false;
+        fool = false;
     }
 
-    new Starfield($("#starfield")[0], { halloween, padoru }).start();
+    new Starfield($("#starfield")[0], { halloween, padoru, fool }).start();
 
     $("#login").click(() => API.redirectLogin());
     $("#logout").click(() => API.logout());
@@ -107,15 +107,15 @@ $(window).on("load", () => {
             $(".center").css("min-height", "100%");
         }
 
-        if (delayLogin) {
-            API.emit("banned", new Date(2069, 5, 9), "Yes");
+        if (fool) {
+            API.emit("banned", new Date(2069, 5, 9), "NSFW skin");
             setTimeout(() => {
                 Prompt.alert.fire({
-                    title: "happy april fools",
+                    title: "Happy April Fools' Day",
                     confirmButtonText: "kek",
                     imageUrl: "/assets/img/kek.png"            
                 }).then(normalLogin);
-            }, 6000);
+            }, 5000);
         } else normalLogin();
     });
 
@@ -138,7 +138,7 @@ $(window).on("load", () => {
         $("#upload").remove();
     }
 
-    API.on("banned", (date, reason) => delayLogin ? banned(reason) :
+    API.on("banned", (date, reason) => fool ? banned(reason) :
         Prompt.showBanned(date, reason).then(() => banned(reason)));
 
     API.on("myskin", skins => Pager.viewMySkins(skins));

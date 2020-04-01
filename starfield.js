@@ -15,6 +15,7 @@ class Starfield {
      * @param {Number} [options.alpha]
      * @param {Boolean} [options.halloween] Interesting
      * @param {Boolean} [options.padoru] PADORU PADORU
+     * @param {Boolean} [options.fool] kek
      */
     constructor (canvas, options) {
 
@@ -34,7 +35,8 @@ class Starfield {
             color: "#00b8ff",
             alpha: .9,
             halloween: false,
-            padoru:    false
+            padoru:    false,
+            fool:      false
         };
 
         Object.assign(this.config, options);
@@ -75,6 +77,10 @@ class Starfield {
 
         if (this.config.padoru && Math.random() < 0.01) {
             return new ImageEffect(this, "padoru", this.randomVector, { rotate: 20 });
+        }
+
+        if (this.config.fool && Math.random() < 0.04 && Date.now() > this.startTime + 5000) {
+            return new ImageEffect(this, "troll", this.randomVector, { rotate: 20 });
         }
 
         return new Star(this, this.randomVector);
