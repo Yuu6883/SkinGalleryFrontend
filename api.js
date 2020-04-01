@@ -103,7 +103,7 @@ module.exports = new class API extends EventEmitter {
             success: res => {
                 this.userInfo = res;
                 if (res.bannedUntil > Date.now()) {
-                    this.emit("banned", new Date(res.bannedUntil));
+                    this.emit("banned", new Date(res.bannedUntil), this.userInfo.bannedReason);
                 } else {
                     this.emit("loginSuccess");
                 }

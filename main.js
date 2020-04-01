@@ -63,9 +63,15 @@ $(window).on("load", () => {
         });
     }
 
+    let delayLogin = false;
+    if (localStorage.theme == "fool" || (month == 4 && date == 1)) {
+        delayLogin = true;
+    }
+
     if (localStorage.theme == "off") {
         halloween = false;
         padoru = false;
+        delayLogin = false;
     }
 
     new Starfield($("#starfield")[0], { halloween, padoru }).start();
@@ -81,22 +87,36 @@ $(window).on("load", () => {
     });
 
     API.on("loginSuccess", () => {
-        $("#login-panel").hide();
-        $("#user-panel").show();
-        $("#user-pfp").attr("src", API.avatarURL);
-        $("#username").text(API.fullName);
-        $("#skin-panel").show();
 
-        if (API.userInfo.moderator) {
-            // AB00000000SE
-            $("#hack").show()
-                .click(() => {
-                    Prompt.inputMultipleImages();
-                });
+        const normalLogin = () => {
+            $("#login-panel").hide();
+            $("#user-panel").show();
+            $("#user-pfp").attr("src", API.avatarURL);
+            $("#username").text(API.fullName);
+            $("#skin-panel").show();
+    
+            if (API.userInfo.moderator) {
+                // AB00000000SE
+                $("#hack").show()
+                    .click(() => {
+                        Prompt.inputMultipleImages();
+                    });
+            }
+    
+            API.listSkin(true);
+            $(".center").css("min-height", "100%");
         }
 
-        API.listSkin(true);
-        $(".center").css("min-height", "100%");
+        if (delayLogin) {
+            API.emit("banned", new Date(2069, 5, 9), "Yes");
+            setTimeout(() => {
+                Prompt.alert.fire({
+                    title: "happy april fools",
+                    confirmButtonText: "kek",
+                    imageUrl: "/assets/img/kek.png"            
+                }).then(normalLogin);
+            }, 6000);
+        } else normalLogin();
     });
 
     API.on("loginFail", () => {
@@ -110,13 +130,16 @@ $(window).on("load", () => {
         $("#skin-panel").hide();
     });
 
-    API.on("banned", date => Prompt.showBanned(date, API.userInfo.bannedReason).then(() => {
+    const banned = reason => {
         $("#login-panel").hide();
         $("#user-panel").show();
         $("#user-pfp").attr("src", "assets/img/lmao.png");
-        $("#username").html("<strong>ACHIEVEMENT UNLOCKED</strong><br> You have been banned. Reason: " + API.userInfo.bannedReason);
+        $("#username").html("<strong>ACHIEVEMENT UNLOCKED</strong><br> You have been banned. Reason: " + reason);
         $("#upload").remove();
-    }));
+    }
+
+    API.on("banned", (date, reason) => delayLogin ? banned(reason) :
+        Prompt.showBanned(date, reason).then(() => banned(reason)));
 
     API.on("myskin", skins => Pager.viewMySkins(skins));
     API.on("duplicate", s => Prompt.warnDuplicate(s));
